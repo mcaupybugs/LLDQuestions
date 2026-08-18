@@ -3,33 +3,45 @@ package TicTacToe;
 import java.util.*;
 import java.util.Scanner;
 
+enum GameStatus {
+    IN_PROGRESS,
+    DRAW,
+    WIN
+}
+
 public class Game {
-    PlayerManager playerManager;
-    Board board;
-    ArrayList<Player> players;
-    Queue<Player> playerQueue;
-    Scanner scanner = new Scanner(System.in);
+    private PlayerManager playerManager;
+    private Board board;
+    private ArrayList<Player> players;
+    private IWinningStrategy winningStrategy;
+    private Queue<Player> playerQueue;
+    private Scanner scanner = new Scanner(System.in);
+    private GameStatus gameStatus;
 
     Game(int players, int boardSize) {
         this.playerManager = new PlayerManager();
+        this.winningStrategy = new DefaultWinningStrategy();
         this.board = new Board(boardSize);
         this.players = playerManager.createPlayers(players);
     }
 
     void startGame() {
+        gameStatus = GameStatus.IN_PROGRESS;
         playerQueue = new LinkedList<>(players);
-        while (true) {
+        while (gameStatus == GameStatus.IN_PROGRESS) {
             Player currentPlayer = playerQueue.poll();
 
             int[] move = getPlayerMove(currentPlayer);
-            board.placeMove(move[0], move[1], currentPlayer.playerSlotType);
+            board.placeMove(move[0], move[1], currentPlayer.getPlayerSlotType());
 
-            if (board.hasWinner(currentPlayer.playerSlotType)) {
-                System.out.println("Player " + currentPlayer.playerSlotType + " wins!");
+            if (winningStrategy.hasWinner(board, currentPlayer.getPlayerSlotType())) {
+                gameStatus = GameStatus.WIN;
+                System.out.println("Player " + currentPlayer.getPlayerSlotType() + " wins!");
                 break;
             }
 
             if (board.isFull()) {
+                gameStatus = GameStatus.DRAW;
                 System.out.println("Game ended in a draw!");
                 break;
             }
@@ -42,7 +54,7 @@ public class Game {
 
     int[] getPlayerMove(Player player) {
         while (true) {
-            System.out.print("Player " + player.playerSlotType + ", enter your move (row and column): ");
+            System.out.print("Player " + player.getPlayerSlotType() + ", enter your move (row and column): ");
             int row = scanner.nextInt();
             int col = scanner.nextInt();
 
@@ -53,5 +65,4 @@ public class Game {
             System.out.println("Invalid move. Try again.");
         }
     }
-
 }

@@ -1,17 +1,14 @@
 package TicTacToe;
 
-public class Player implements IPlayer {
+public class Player  {
 
-    SlotType playerSlotType;
+    private SlotType playerSlotType;
 
     public Player(SlotType playerSlotType) {
         this.playerSlotType = playerSlotType;
     }
 
-    @Override
-    public void move(Slot slot) {
-        // Implementation for player move
-        slot.slotType = this.playerSlotType;
+    public SlotType getPlayerSlotType() {
+        return playerSlotType;
     }
-
 }
